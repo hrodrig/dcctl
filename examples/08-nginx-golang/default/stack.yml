@@ -1,0 +1,22 @@
+# Nginx + Go backend — proxy depends on backend (awesome-compose)
+# https://github.com/docker/awesome-compose/tree/master/nginx-golang
+# Nginx proxies to backend; backend listens on BACKEND_PORT (env).
+
+services:
+  backend:
+    build: ../backend
+    environment:
+      BACKEND_PORT: ${BACKEND_PORT:-80}
+    # No exposed ports; only nginx talks to backend
+
+  proxy:
+    image: nginx:alpine
+    volumes:
+      - type: bind
+        source: ../proxy/nginx.conf
+        target: /etc/nginx/conf.d/default.conf
+        read_only: true
+    ports:
+      - "${HTTP_PORT:-80}:80"
+    depends_on:
+      - backend

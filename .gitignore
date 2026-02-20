@@ -23,3 +23,5 @@
 !internal/**
 !docs/
 !docs/**
+!examples/
+!examples/**

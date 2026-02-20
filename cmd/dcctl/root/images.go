@@ -3,98 +3,14 @@ package root
 import (
 	"bufio"
 	"context"
-	"errors"
 	"fmt"
 	"os"
 	"os/exec"
 	"sort"
 	"strings"
 
-	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 )
-
-func newImagesCmd(opts *options) *cobra.Command {
-	return &cobra.Command{
-		Use:   "images <env[.target]> <ls|rm>",
-		Short: "List or remove images used by manifests",
-		Long:  "Lists or removes images referenced by manifests. Target: <environment> or <environment>.<service-or-manifest>.",
-		Example: `  dcctl images default ls
-  dcctl images default.app rm`,
-		Args: cobra.ExactArgs(2),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx, cancel := withSignalCancel(context.Background())
-			defer cancel()
-			if err := ensureDockerAvailable(); err != nil {
-				return err
-			}
-			envName, target := parseImagesTarget(args[0])
-			if envName == "" {
-				return errors.New("missing environment (use <env> or <env>.<service>)")
-			}
-			action := strings.ToLower(strings.TrimSpace(args[1]))
-			if action != "ls" && action != "rm" {
-				return fmt.Errorf("unsupported action %q (use ls or rm)", action)
-			}
-			loaded, err := loadOrBootstrap(&options{
-				environment: envName,
-				configFile:  opts.configFile,
-				debug:       opts.debug,
-			})
-			if err != nil {
-				return err
-			}
-			if loaded == nil {
-				return nil
-			}
-			if err := ensureEnvironmentDir(loaded); err != nil {
-				return err
-			}
-			var manifestPaths []string
-			if target != "" {
-				manifestPaths, err = resolveTargetManifestPaths(loaded, []string{target})
-				if err != nil {
-					return err
-				}
-			} else {
-				manifestPaths = resolveManifestPaths(loaded)
-			}
-			if len(manifestPaths) == 0 {
-				log.Warn("no manifests found")
-				return nil
-			}
-			images, err := collectImages(manifestPaths)
-			if err != nil {
-				return err
-			}
-			if len(images) == 0 {
-				log.Warn("no images found")
-				return nil
-			}
-			switch action {
-			case "ls":
-				printImages(images)
-				return nil
-			case "rm":
-				printImages(images)
-				if !confirmImageRemoval(images) {
-					log.Warn("cancelled")
-					return nil
-				}
-				return removeImages(ctx, images)
-			}
-			return nil
-		},
-	}
-}
-
-func parseImagesTarget(input string) (env, target string) {
-	parts := strings.SplitN(strings.TrimSpace(input), ".", 2)
-	if len(parts) == 1 {
-		return parts[0], ""
-	}
-	return parts[0], parts[1]
-}
 
 func collectImages(manifestPaths []string) ([]string, error) {
 	seen := make(map[string]struct{})
@@ -201,5 +117,27 @@ func removeImage(ctx context.Context, image string) error {
 		return fmt.Errorf("%s", msg)
 	}
 	log.Success("image removed: %s", image)
+	return nil
+}
+
+// pullImages runs docker pull for each image (ensures you have the latest).
+func pullImages(ctx context.Context, images []string) error {
+	for _, image := range images {
+		if err := pullImage(ctx, image); err != nil {
+			log.Warn("failed to pull %s: %v", image, err)
+			continue
+		}
+		log.Success("pulled: %s", image)
+	}
+	return nil
+}
+
+func pullImage(ctx context.Context, image string) error {
+	cmd := exec.CommandContext(ctx, "docker", "image", "pull", image)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		return err
+	}
 	return nil
 }

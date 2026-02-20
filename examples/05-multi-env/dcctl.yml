@@ -1,0 +1,20 @@
+# dcctl config: two environments, default_environment = minecraft
+# Run from this directory: dcctl --config-file=dcctl.yml up
+# Switch: dcctl -e default up  (counter+Redis) | dcctl up  (Minecraft)
+
+schema_version: "1.0"
+common:
+  dcctl:
+    verbose_level: 2
+  compose:
+    ignore_orphans: true
+    project_name: "dcctl-multi-env"
+dcctl:
+  default_environment: "minecraft"
+  environments:
+    default:
+      services:
+        - stack
+    minecraft:
+      services:
+        - server

@@ -1,0 +1,19 @@
+# dcctl config for example: full-stack (multiple manifests)
+# Run from repo root: dcctl --config-file=examples/04-full-stack/dcctl.yml up
+# Shows dcctl combining several compose files: databases, api, frontend.
+
+schema_version: "1.0"
+common:
+  dcctl:
+    verbose_level: 2
+  compose:
+    ignore_orphans: true
+    project_name: "dcctl-fullstack"
+dcctl:
+  default_environment: "default"
+  environments:
+    default:
+      services:
+        - databases
+        - api
+        - frontend

@@ -52,7 +52,7 @@ Use -e/--environment to select an environment (defaults to dcctl.default_environ
 		newLogsCmd(opts),
 		newExecCmd(opts),
 		newManifestsCmd(opts),
-		newImagesCmd(opts),
+		newImageCmd(opts),
 		newShowPortsCmd(opts),
 		newVolumesCmd(opts),
 		newVersionCmd(),

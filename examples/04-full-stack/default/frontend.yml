@@ -1,0 +1,8 @@
+# Static frontend — nginx serving a page that calls the API
+services:
+  frontend:
+    image: nginx:alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ../frontend/html:/usr/share/nginx/html:ro

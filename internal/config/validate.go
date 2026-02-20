@@ -8,6 +8,10 @@ func Validate(cfg Config) error {
 		return fmt.Errorf("dcctl.environments is required and must not be empty")
 	}
 
+	if _, ok := cfg.Dcctl.Environments["default"]; !ok {
+		return fmt.Errorf("environment %q is required and must always exist", "default")
+	}
+
 	for name, env := range cfg.Dcctl.Environments {
 		if len(env.Services) == 0 {
 			return fmt.Errorf("environment %q must have at least one service", name)

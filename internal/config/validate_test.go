@@ -84,7 +84,7 @@ func TestValidate(t *testing.T) {
 			errorMsg:    "does not exist",
 		},
 		{
-			name: "valid config without default environment",
+			name: "valid config without default_environment set",
 			config: Config{
 				Dcctl: Dcctl{
 					Environments: map[string]Environment{
@@ -93,6 +93,18 @@ func TestValidate(t *testing.T) {
 				},
 			},
 			expectError: false,
+		},
+		{
+			name: "missing required default environment",
+			config: Config{
+				Dcctl: Dcctl{
+					Environments: map[string]Environment{
+						"uat": {Services: []string{"app"}},
+					},
+				},
+			},
+			expectError: true,
+			errorMsg:    "default",
 		},
 	}
 

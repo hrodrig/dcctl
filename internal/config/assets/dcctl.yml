@@ -1,8 +1,16 @@
 # dcctl - Docker Compose Control
 # https://github.com/hrodrig/dcctl
 #
-# Put compose manifests under: <config_dir>/<environment>/<service>.yml
-# Example: ~/.dcctl/default/app.yml, ~/.dcctl/default/db.yml
+# One config, one command: get the full stack up for any environment. Great for onboarding (weeks → hours).
+#
+# Concept:
+#   - You define named environments (default, uat, prod, fix, etc. — whatever you need).
+#   - You choose which environment to use via the CLI (-e/--environment) or set default_environment here.
+#   - Each environment lists the services (manifest names) to run for that environment.
+#   - Manifests live at: <config_dir>/<environment>/<service>.yml
+#     Example: same config dir, environment "uat" → uat/app.yml, uat/db.yml
+#
+# The environment named "default" must always exist. You can add more (uat, prod, fix, etc.).
 
 schema_version: "1.0"
 common:
@@ -12,12 +20,19 @@ common:
     ignore_orphans: true
     project_name: "dcctl"
 dcctl:
+  # Which environment to use when -e/--environment is not passed
   default_environment: "default"
   environments:
     default:
       services:
         - app
-    # example:
+    # Add more environments as needed; each has its own list of manifest names
+    # uat:
     #   services:
     #     - app
     #     - db
+    # prod:
+    #   services:
+    #     - app
+    #     - db
+    #     - worker

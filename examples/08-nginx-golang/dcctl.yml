@@ -1,0 +1,16 @@
+# dcctl config — Nginx + Go backend (awesome-compose)
+# Run: dcctl --config-file=dcctl.yml up
+
+schema_version: "1.0"
+common:
+  dcctl:
+    verbose_level: 2
+  compose:
+    ignore_orphans: true
+    project_name: "dcctl-nginx-golang"
+dcctl:
+  default_environment: "default"
+  environments:
+    default:
+      services:
+        - stack

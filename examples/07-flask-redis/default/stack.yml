@@ -1,0 +1,26 @@
+# Flask + Redis — env vars and depends_on (awesome-compose)
+# https://github.com/docker/awesome-compose/tree/master/flask-redis
+# Web app uses REDIS_URL; waits for Redis to be healthy.
+
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+
+  web:
+    build: ..
+    environment:
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      FLASK_PORT: ${FLASK_PORT:-8000}
+    ports:
+      - "${FLASK_PORT:-8000}:8000"
+    depends_on:
+      redis:
+        condition: service_healthy
+    stop_signal: SIGINT

@@ -11,6 +11,10 @@ Sequence diagrams for main flows (Mermaid format). View in any Markdown viewer t
 | [01-config-and-up](./sequence/01-config-and-up.md) | Load config, resolve environment and manifests, run docker compose up |
 | [02-down-and-cleanup](./sequence/02-down-and-cleanup.md) | Stop services, optional remove containers/volumes (down) |
 | [03-manifest-resolution](./sequence/03-manifest-resolution.md) | How dcctl resolves config path, environment, and manifest file paths |
+| [04-image](./sequence/04-image.md) | Image ls / pull / remove from current environment manifests |
+| [05-show-ports](./sequence/05-show-ports.md) | Extract and list published ports per service (where to connect) |
+| [06-manifests](./sequence/06-manifests.md) | Write sample compose manifest into environment directory |
+| [07-volumes](./sequence/07-volumes.md) | Volumes clean: list (by project or all), select, confirm, remove |
 
 ## Terminal demo (VHS)
 

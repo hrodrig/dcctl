@@ -1,0 +1,16 @@
+# dcctl config for example: WordPress + MariaDB
+# Run from repo root: dcctl --config-file=examples/02-wordpress-mariadb/dcctl.yml up
+
+schema_version: "1.0"
+common:
+  dcctl:
+    verbose_level: 2
+  compose:
+    ignore_orphans: true
+    project_name: "dcctl-wordpress"
+dcctl:
+  default_environment: "default"
+  environments:
+    default:
+      services:
+        - wordpress
