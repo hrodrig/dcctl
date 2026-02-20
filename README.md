@@ -1,9 +1,11 @@
 # dcctl — Docker Compose Control
 
-[![version](https://img.shields.io/badge/version-0.1.4-blue)](https://github.com/hrodrig/dcctl/releases)
+[![version](https://img.shields.io/badge/version-0.1.5-blue)](https://github.com/hrodrig/dcctl/releases)
 [![release](https://img.shields.io/github/v/release/hrodrig/dcctl)](https://github.com/hrodrig/dcctl/releases)
 [![Go 1.26](https://img.shields.io/badge/Go-1.26-00ADD8)](https://go.dev/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+**Repo:** [github.com/hrodrig/dcctl](https://github.com/hrodrig/dcctl) · **Releases:** [Releases](https://github.com/hrodrig/dcctl/releases)
 
 CLI to manage Docker Compose stacks per **environment** using a single YAML config file. You define which manifests belong to each environment; dcctl runs docker compose with exactly those files for `up`, `down`, `status`, `logs`, and more.
 
@@ -20,12 +22,69 @@ CLI to manage Docker Compose stacks per **environment** using a single YAML conf
 
 ## Install
 
+**From source (recommended):** Clone the repo, then:
+
+```bash
+go install ./cmd/dcctl
+# or with version/commit/date baked in:
+make install
+```
+
+This installs the binary to `$GOBIN` (default `$HOME/go/bin`). Ensure `$GOBIN` is on your `PATH`.
+
+**Pre-built binaries:** [Releases](https://github.com/hrodrig/dcctl/releases) provide binaries (`.tar.gz`, `.zip`), `.deb`, and `.rpm` packages for Linux, macOS, and Windows (amd64 and arm64).
+
+**Homebrew (macOS):**
+
+```bash
+brew install hrodrig/dcctl/dcctl
+```
+
+**Build:** To build in the current directory (e.g. for development):
+
 ```bash
 go build -o dcctl ./cmd/dcctl
 # or with version info:
-# make build
-# optional: move to PATH
-# sudo mv dcctl /usr/local/bin/
+make build
+# Custom install path: GOBIN=~/bin make install
+```
+
+## Docker
+
+**Published image (each release):** Multi-arch images (linux/amd64, linux/arm64) are published to GitHub Container Registry as `ghcr.io/hrodrig/dcctl`. Use a version tag or `latest`.
+
+```bash
+docker pull ghcr.io/hrodrig/dcctl:v0.1.5
+# or
+docker pull ghcr.io/hrodrig/dcctl:latest
+```
+
+**Build from source:** The repo includes a multi-stage Dockerfile (Go 1.26, Alpine 3.19): build stage compiles the binary with version/commit/build date injected via build args; runtime stage is minimal and runs as non-root. Use `make docker-build` to build locally with version info.
+
+**Image details:**
+
+- **Runtime base:** Alpine 3.19. Only `ca-certificates` for HTTPS. No shell or extra tools in the runtime image.
+- **User:** Runs as non-root user `dcctl` (binary in `/home/dcctl/dcctl`).
+- **Labels:** OCI image labels (title, description, source).
+
+**Build (from repo root):** Use `make docker-build` so the image gets version, commit, and build date from the `VERSION` file and git (same as release builds).
+
+**Run with your config:** dcctl inside the container reads config from `~/.dcctl/dcctl.yml` (i.e. `/home/dcctl/.dcctl/dcctl.yml`). Mount your config directory and the Docker socket so the container can use your manifests and talk to the host Docker daemon:
+
+```bash
+docker run --rm -it \
+  -v ~/.dcctl:/home/dcctl/.dcctl \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  ghcr.io/hrodrig/dcctl:latest up
+```
+
+Use any dcctl command in place of `up` (`down`, `status`, `logs`, `show-ports`, etc.). If the host Docker socket is only readable by the `docker` group, run the container with that group (e.g. `--group-add $(stat -c '%g' /var/run/docker.sock)` on Linux, or ensure the numeric GID matches). For a project-specific config, mount the project dir and pass `--config-file`:
+
+```bash
+docker run --rm -it \
+  -v /path/to/project:/home/dcctl/project:ro \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  ghcr.io/hrodrig/dcctl:latest --config-file=/home/dcctl/project/dcctl.yml up
 ```
 
 ## Quick start
