@@ -1,13 +1,14 @@
 # Runtime image for GoReleaser dockers_v2.
-# Expects linux/amd64/dcctl and linux/arm64/dcctl (created by before hook in goreleaser).
+# Goreleaser provides only linux/<arch>/dcctl in the build context per platform.
 ARG TARGETPLATFORM
 FROM alpine:3.19
+ARG TARGETPLATFORM
 RUN apk --no-cache add ca-certificates
 RUN adduser -D -g "" dcctl
 COPY linux/ /tmp/linux/
 RUN case "$TARGETPLATFORM" in \
-	linux/amd64) cp /tmp/linux/amd64/dcctl /home/dcctl/dcctl ;; \
-	linux/arm64) cp /tmp/linux/arm64/dcctl /home/dcctl/dcctl ;; \
+	linux/amd64*) cp /tmp/linux/amd64/dcctl /home/dcctl/dcctl ;; \
+	linux/arm64*) cp /tmp/linux/arm64/dcctl /home/dcctl/dcctl ;; \
 	*) cp /tmp/linux/amd64/dcctl /home/dcctl/dcctl ;; \
 	esac && chown dcctl:dcctl /home/dcctl/dcctl
 USER dcctl

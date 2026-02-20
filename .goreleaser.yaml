@@ -66,9 +66,9 @@ release:
     owner: hrodrig
     name: dcctl
 
-# Docker: multi-stage Dockerfile with build-args (no linux/ layout needed)
+# Docker: use Dockerfile.release; goreleaser provides only linux/<arch>/dcctl in context
 dockers_v2:
-  - dockerfile: Dockerfile
+  - dockerfile: Dockerfile.release
     ids:
       - dcctl
     images:
