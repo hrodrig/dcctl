@@ -1,0 +1,8 @@
+# Sample compose manifest for dcctl
+# Rename to app.yml and add "app" to dcctl.environments.<env>.services if needed.
+
+services:
+  app:
+    image: nginx:alpine
+    ports:
+      - "8080:80"

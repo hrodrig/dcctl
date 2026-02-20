@@ -1,0 +1,23 @@
+# dcctl - Docker Compose Control
+# https://github.com/hrodrig/dcctl
+#
+# Put compose manifests under: <config_dir>/<environment>/<service>.yml
+# Example: ~/.dcctl/default/app.yml, ~/.dcctl/default/db.yml
+
+schema_version: "1.0"
+common:
+  dcctl:
+    verbose_level: 2  # 0=quiet, 1=normal, 2=verbose, 3=debug
+  compose:
+    ignore_orphans: true
+    project_name: "dcctl"
+dcctl:
+  default_environment: "default"
+  environments:
+    default:
+      services:
+        - app
+    # example:
+    #   services:
+    #     - app
+    #     - db

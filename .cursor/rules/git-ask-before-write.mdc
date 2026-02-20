@@ -1,0 +1,15 @@
+---
+description: Always ask the user before running git add, commit, push, or tag.
+alwaysApply: true
+---
+
+# Git: ask before write
+
+Before running any of these commands, **always ask the user for confirmation**:
+
+- `git add`
+- `git commit`
+- `git push`
+- `git tag` (creating or pushing tags)
+
+Do not execute them until the user approves (e.g. "sí", "adelante", "ok", or explicit confirmation).
